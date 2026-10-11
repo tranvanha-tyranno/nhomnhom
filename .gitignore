@@ -1,8 +1,12 @@
 .env*
-.next/
-node_modules/
+vendor/
+.phpunit.cache/
 coverage/
 dist/
 tmp/
-npm-debug.log*
+data/
+backups/
+__pycache__/
+.next/
+node_modules/
 *.tsbuildinfo
