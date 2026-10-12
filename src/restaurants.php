@@ -18,13 +18,13 @@ function validateSearchOptions(string $query, int $page, int $pageSize): array
 function parseSearchOptions(array $input): array
 {
     foreach ($input as $key => $value) {
-        if (!in_array($key, ['q', 'page', 'pageSize'], true) || is_array($value)) {
+        if (!in_array($key, ['q', 'page', 'pageSize', 'maxPrice', 'priceLevel', 'minRating', 'vegetarian', 'sort'], true) || is_array($value)) {
             throw new InvalidArgumentException('Tham số tìm kiếm không hợp lệ hoặc bị lặp.');
         }
     }
     $page = parsePositiveInteger($input['page'] ?? '1', 'Trang');
     $pageSize = parsePositiveInteger($input['pageSize'] ?? '12', 'Số kết quả mỗi trang');
-    return validateSearchOptions((string) ($input['q'] ?? ''), $page, $pageSize);
+    return validateSearchOptions((string) ($input['q'] ?? ''), $page, $pageSize) + parseRestaurantFilters($input);
 }
 
 function parsePositiveInteger(mixed $value, string $label): int
@@ -54,18 +54,21 @@ function findRestaurants(PDO $db, array $options): array
     $from = $match !== '' ? 'restaurants r JOIN restaurant_search ON restaurant_search.rowid = r.id' : 'restaurants r';
     $where = $match !== '' ? "r.status = 'active' AND restaurant_search MATCH :match" : "r.status = 'active'";
     $params = $match !== '' ? [':match' => $match] : [];
+    $where .= restaurantFilterSql($options, $params);
+    $price = restaurantPriceSql();
 
     try {
         $totalStatement = $db->prepare("SELECT COUNT(*) FROM {$from} WHERE {$where}");
         $totalStatement->execute($params);
         $total = (int) $totalStatement->fetchColumn();
         $order = $match !== '' ? 'bm25(restaurant_search, 3.0, 1.0), ' : '';
+        $order = restaurantOrderSql($db, $options, $order);
         $sql = "SELECT r.id, r.name, r.description, r.address, r.latitude, r.longitude,
-                    r.price_level, r.is_demo, r.review_count,
+                    r.price_level, r.is_demo, r.review_count, {$price} AS min_price_vnd,
                     CASE WHEN r.review_count = 0 THEN 0.0 ELSE round(1.0 * r.rating_sum / r.review_count, 1) END AS rating,
                     (SELECT group_concat(c.name, ', ') FROM restaurant_cuisines rc JOIN cuisines c ON c.id = rc.cuisine_id WHERE rc.restaurant_id = r.id) AS cuisine,
                     (SELECT json_group_array(t.name) FROM restaurant_tags rt JOIN tags t ON t.id = rt.tag_id WHERE rt.restaurant_id = r.id) AS tags
-                FROM {$from} WHERE {$where} ORDER BY {$order}rating DESC, r.id LIMIT :limit OFFSET :offset";
+                FROM {$from} WHERE {$where} ORDER BY {$order} LIMIT :limit OFFSET :offset";
         $statement = $db->prepare($sql);
         foreach ($params as $key => $value) {
             $statement->bindValue($key, $value, PDO::PARAM_STR);
@@ -87,6 +90,7 @@ function findRestaurants(PDO $db, array $options): array
 function findRestaurantsMysql(PDO $db, array $options): array
 {
     $tokens = discoveryTokens($options['query']);
+    if ($options['query'] !== '' && !$tokens) return emptyRestaurantResults($options);
     $where = ["r.status = 'active'"];
     $params = [];
     foreach ($tokens as $index => $token) {
@@ -110,16 +114,19 @@ function findRestaurantsMysql(PDO $db, array $options): array
         $where[] = '(' . implode(' OR ', $parts) . ')';
     }
     $whereSql = implode(' AND ', $where);
+    $whereSql .= restaurantFilterSql($options, $params);
+    $price = restaurantPriceSql();
+    $order = restaurantOrderSql($db, $options);
     $count = $db->prepare("SELECT COUNT(*) FROM restaurants r WHERE {$whereSql}");
     bindRestaurantParams($count, $params);
     $count->execute();
     $total = (int) $count->fetchColumn();
     $statement = $db->prepare("SELECT r.id, r.name, r.description, r.address, r.latitude, r.longitude,
-        r.price_level, r.is_demo, r.review_count,
+        r.price_level, r.is_demo, r.review_count, {$price} AS min_price_vnd,
         CASE WHEN r.review_count=0 THEN 0.0 ELSE ROUND(1.0*r.rating_sum/r.review_count, 1) END AS rating,
         (SELECT GROUP_CONCAT(c.name SEPARATOR ', ') FROM restaurant_cuisines rc JOIN cuisines c ON c.id=rc.cuisine_id WHERE rc.restaurant_id=r.id) AS cuisine,
         (SELECT GROUP_CONCAT(t.name SEPARATOR '||') FROM restaurant_tags rt JOIN tags t ON t.id=rt.tag_id WHERE rt.restaurant_id=r.id) AS tags_text
-        FROM restaurants r WHERE {$whereSql} ORDER BY rating DESC, r.id LIMIT :limit OFFSET :offset");
+        FROM restaurants r WHERE {$whereSql} ORDER BY {$order} LIMIT :limit OFFSET :offset");
     bindRestaurantParams($statement, $params);
     $statement->bindValue(':limit', $options['pageSize'], PDO::PARAM_INT);
     $statement->bindValue(':offset', ($options['page'] - 1) * $options['pageSize'], PDO::PARAM_INT);
@@ -142,15 +149,18 @@ function findRestaurantsWithLike(PDO $db, array $options, array $tokens): array
         $params[$placeholder] = '%' . strtolower($token) . '%';
     }
     $where = implode(' AND ', $conditions);
+    $where .= restaurantFilterSql($options, $params);
+    $price = restaurantPriceSql();
+    $order = restaurantOrderSql($db, $options);
     $count = $db->prepare("SELECT COUNT(*) FROM restaurants r WHERE {$where}");
     $count->execute($params);
     $total = (int) $count->fetchColumn();
     $statement = $db->prepare("SELECT r.id, r.name, r.description, r.address, r.latitude, r.longitude,
-        r.price_level, r.is_demo, r.review_count,
+        r.price_level, r.is_demo, r.review_count, {$price} AS min_price_vnd,
         CASE WHEN r.review_count = 0 THEN 0.0 ELSE round(1.0 * r.rating_sum / r.review_count, 1) END AS rating,
         (SELECT group_concat(c.name, ', ') FROM restaurant_cuisines rc JOIN cuisines c ON c.id = rc.cuisine_id WHERE rc.restaurant_id = r.id) AS cuisine,
         (SELECT json_group_array(t.name) FROM restaurant_tags rt JOIN tags t ON t.id = rt.tag_id WHERE rt.restaurant_id = r.id) AS tags
-        FROM restaurants r WHERE {$where} ORDER BY rating DESC, r.id LIMIT :limit OFFSET :offset");
+        FROM restaurants r WHERE {$where} ORDER BY {$order} LIMIT :limit OFFSET :offset");
     foreach ($params as $key => $value) {
         $statement->bindValue($key, $value, PDO::PARAM_STR);
     }
@@ -175,6 +185,7 @@ function mapRestaurantRow(array $row): array
         'lng' => (float) $row['longitude'],
         'tags' => is_array($tags) ? array_values(array_map('strval', $tags)) : [],
         'priceLevel' => (int) $row['price_level'],
+        'minPriceVnd' => isset($row['min_price_vnd']) ? (int) $row['min_price_vnd'] : null,
         'rating' => (float) $row['rating'],
         'isDemo' => (bool) $row['is_demo'],
         'reviewCount' => (int) $row['review_count'],

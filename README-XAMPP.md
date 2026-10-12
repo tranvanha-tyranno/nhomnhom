@@ -52,6 +52,13 @@ Các endpoint PHP đã có:
 - `GET/POST /api/groups.php`: tạo, tham gia và bình chọn nhóm.
 - `GET/POST /api/bookings.php`: tạo và xem yêu cầu đặt bàn.
 - `GET /api/insights.php`: bảng xu hướng lượt thích và đặt bàn.
+- `GET /api/restaurant.php?id=11`: chi tiết quán, thực đơn, giờ mở cửa và tiện ích.
+- `GET/POST /api/saved.php`: quán đã lưu trong phiên; thao tác ghi cần CSRF token.
+
+Bộ lọc giá/món chay/đánh giá, so sánh 2–3 quán và chọn quán ngẫu nhiên nằm ở
+tab **Tìm quán**; quán yêu thích nằm trong tab **Quán đã lưu**. Các chức năng
+khác có tab riêng. Tham số API và kiểm thử mới được mô tả trong `README.md`.
+Bảng lưu quán tự tạo ở lần truy cập đầu tiên; không cần import lại dữ liệu.
 
 Chạy smoke test bằng PHP của XAMPP:
 

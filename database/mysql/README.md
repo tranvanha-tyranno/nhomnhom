@@ -27,6 +27,12 @@ SetEnv NHOMNHOM_DB_PASSWORD ""
 Restart Apache after changing the variables, then open
 `http://localhost/nhomnhom/`. XAMPP PHP must have `pdo_mysql` enabled.
 
+Restaurant filters, menu details and saved restaurants also support this driver.
+`api/saved.php` creates `nomnom_saved_restaurants` on first use, so the database
+account needs CREATE TABLE permission. Existing installations do not need to
+re-import the catalog dump. Saved entries are scoped to the current PHP session.
+See the root README for the new endpoints and localhost HTTP smoke test.
+
 ## Regenerate the dump
 
 The export is repeatable and reads the local SQLite source:

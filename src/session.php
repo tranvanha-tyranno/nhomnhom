@@ -25,8 +25,8 @@ function nomnomCsrfToken(): string
 function requireNomNomCsrf(array $payload): void
 {
     $expected = nomnomCsrfToken();
-    $provided = (string) ($payload['csrfToken'] ?? '');
-    if ($provided === '' || !hash_equals($expected, $provided)) {
+    $provided = $payload['csrfToken'] ?? '';
+    if (!is_string($provided) || $provided === '' || !hash_equals($expected, $provided)) {
         throw new InvalidArgumentException('Token bảo vệ biểu mẫu không hợp lệ.');
     }
 }

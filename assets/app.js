@@ -28,7 +28,8 @@
       : '<a class="mapButton" target="_blank" rel="noopener noreferrer" href="' + escapeHtml(directionsUrl(place)) + '">↗ <span>Chỉ đường</span></a>';
     return '<article class="resultCard"><div class="resultTopline"><span class="rankBadge">#' + ((pagination.page - 1) * pagination.pageSize + index + 1) + '</span><span class="ratingBadge">★ ' + Number(place.rating).toFixed(1) + '</span></div>'
       + '<div class="resultBody"><p class="cuisineLabel">' + escapeHtml(place.cuisine) + '</p><h3>' + escapeHtml(place.name) + '</h3><p>' + escapeHtml(place.description) + '</p></div>'
-      + '<div class="tagRow" aria-label="Thẻ món ăn">' + tags + '</div><div class="resultFooter"><span class="addressLine">📍 ' + escapeHtml(place.address) + '</span>' + action + '</div></article>';
+      + '<div class="tagRow" aria-label="Thẻ món ăn">' + tags + '</div><p class="filterHint">Giá món từ ' + window.NhomRestaurantDialog.money(place.minPriceVnd) + ' · ' + Number(place.reviewCount) + ' đánh giá</p>'
+      + '<div class="resultFooter"><span class="addressLine">📍 ' + escapeHtml(place.address) + '</span>' + action + '</div>' + window.NhomExplore.cardActions(place) + '</article>';
   }
 
   function render(data) {
@@ -37,6 +38,7 @@
     if (!places.length) { results.innerHTML = '<p class="emptyState">Chưa có món phù hợp.</p>'; return; }
     results.innerHTML = '<div class="resultsGrid">' + places.map(function (place, index) { return card(place, index, data.pagination); }).join('') + '</div>'
       + '<nav class="pagination" aria-label="Phân trang kết quả"><button class="quickQuery pageButton" data-page="' + (data.pagination.page - 1) + '" ' + (data.pagination.page <= 1 ? 'disabled' : '') + '>Trang trước</button><span>Trang ' + data.pagination.page + ' / ' + data.pagination.totalPages + '</span><button class="quickQuery pageButton" data-page="' + (data.pagination.page + 1) + '" ' + (data.pagination.page >= data.pagination.totalPages ? 'disabled' : '') + '>Trang sau</button></nav>';
+    window.NhomExplore.onResults(places);
   }
 
   function showError(message) { resultCount.innerHTML = '📍 <span>Không tải được</span>'; results.innerHTML = '<div class="emptyState" role="alert">' + escapeHtml(message) + ' <button class="quickQuery" id="retry">Thử lại</button></div>'; }
@@ -141,12 +143,13 @@
     if (state.controller) state.controller.abort();
     state.controller = new AbortController();
     resultCount.innerHTML = '📍 <span>Đang tải…</span>'; results.innerHTML = '<p class="emptyState">Đang tìm quán ăn…</p>';
-    const params = new URLSearchParams({ q: state.query, page: String(state.page), pageSize: String(state.pageSize) });
+    const params = new URLSearchParams(Object.assign({ q: state.query, page: String(state.page), pageSize: String(state.pageSize) }, window.NhomExplore.filters()));
     fetch('api/restaurants.php?' + params.toString(), { signal: state.controller.signal, headers: { Accept: 'application/json' } })
       .then(function (response) { return response.json().then(function (body) { if (!response.ok || body.success !== true) throw new Error(body.error || 'Không thể tải danh sách quán ăn.'); return body; }); })
       .then(render).catch(function (error) { if (error.name !== 'AbortError') showError(error.message); });
   }
   function scheduleLoad() { clearTimeout(state.timer); state.timer = setTimeout(load, 250); }
+  document.addEventListener('nomnom:filters', function () { state.page = 1; load(); });
 
   queryInput.addEventListener('input', function () { state.query = queryInput.value; state.page = 1; scheduleLoad(); });
   document.getElementById('search-form').addEventListener('submit', function (event) { event.preventDefault(); state.query = queryInput.value; state.page = 1; load(); });
@@ -162,7 +165,7 @@
   function renderCurrentLinks() { document.querySelectorAll('.mapButton').forEach(function (link) { const url = new URL(link.href); url.searchParams.set('travelmode', state.mode); link.href = url.toString(); }); }
   updateTasteCount();
   bindFeatureForms();
-  loadProfile().then(function () { loadDiscovery(true); });
+  loadProfile().then(function () { window.NhomExplore.start(); loadDiscovery(true); });
   loadInsights();
   load();
 }());
