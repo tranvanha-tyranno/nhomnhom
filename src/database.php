@@ -142,10 +142,39 @@ CREATE TABLE IF NOT EXISTS nomnom_accounts (
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     display_name TEXT NOT NULL CHECK(length(display_name) BETWEEN 1 AND 80),
+    role TEXT NOT NULL DEFAULT 'customer' CHECK(role IN ('customer', 'merchant', 'admin')),
     status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'disabled')),
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS nomnom_merchant_restaurants (
+    account_id INTEGER NOT NULL REFERENCES nomnom_accounts(id) ON DELETE CASCADE,
+    restaurant_id INTEGER NOT NULL UNIQUE REFERENCES restaurants(id) ON DELETE CASCADE,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(account_id, restaurant_id)
+);
 SQL);
+    ensureNomNomAccountRoleColumn($db);
+}
+
+function ensureNomNomAccountRoleColumn(PDO $db): void
+{
+    if (isMysqlConnection($db)) {
+        $check = $db->query(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'nomnom_accounts' AND COLUMN_NAME = 'role'"
+        );
+        if ((int) $check->fetchColumn() === 0) {
+            $db->exec("ALTER TABLE nomnom_accounts ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'customer' AFTER display_name");
+        }
+        return;
+    }
+    $cols = $db->query('PRAGMA table_info(nomnom_accounts)')->fetchAll();
+    foreach ($cols as $col) {
+        if (($col['name'] ?? '') === 'role') {
+            return;
+        }
+    }
+    $db->exec("ALTER TABLE nomnom_accounts ADD COLUMN role TEXT NOT NULL DEFAULT 'customer'");
 }
 
 function ensureNomNomFeatureTablesMysql(PDO $db): void
@@ -190,7 +219,12 @@ CREATE TABLE IF NOT EXISTS nomnom_dish_elo (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS nomnom_accounts (
     id BIGINT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(254) NOT NULL UNIQUE, password_hash VARCHAR(255) NOT NULL,
-    display_name VARCHAR(80) NOT NULL, status VARCHAR(15) NOT NULL DEFAULT 'active', created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    display_name VARCHAR(80) NOT NULL, role VARCHAR(20) NOT NULL DEFAULT 'customer', status VARCHAR(15) NOT NULL DEFAULT 'active', created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS nomnom_merchant_restaurants (
+    account_id BIGINT NOT NULL, restaurant_id BIGINT NOT NULL UNIQUE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(account_id, restaurant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 SQL);
+    ensureNomNomAccountRoleColumn($db);
 }

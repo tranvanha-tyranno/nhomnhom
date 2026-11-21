@@ -744,3 +744,79 @@ button, a, select, input[type="checkbox"] { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Registration Role Selector */
+.roleSelector { border: 0; margin: 0 0 14px; padding: 0; }
+.roleSelector legend { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.roleOptions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.roleOption { position: relative; cursor: pointer; margin: 0 !important; }
+.roleOption input { position: absolute; opacity: 0; pointer-events: none; }
+.roleCard {
+  display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 14px;
+  border: 1.5px solid var(--line); background: var(--surface); transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.roleCard .uiIcon { width: 18px; height: 18px; color: var(--muted); }
+.roleCard strong { font-size: 13.5px; color: var(--ink); }
+.roleCard small { font-size: 11.5px; line-height: 1.4; color: var(--muted); }
+.roleOption input:checked + .roleCard { border-color: var(--accent-warm); background: #fff5ef; }
+.roleOption input:checked + .roleCard .uiIcon { color: var(--accent-warm); }
+.roleOption input:focus-visible + .roleCard { outline: 2px solid var(--accent-warm); outline-offset: 2px; }
+[data-theme="dark"] .roleOption input:checked + .roleCard { background: #2e2018; border-color: #f07b48; }
+
+/* Merchant Portal */
+.merchantHero { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; }
+.merchantStats { display: flex; flex-wrap: wrap; gap: 12px; }
+.merchantStatBox {
+  min-width: 118px; padding: 16px 20px; border-radius: 16px; background: var(--surface);
+  border: 1px solid var(--line); display: grid; gap: 4px; text-align: center;
+}
+.merchantStatBox strong { font-family: var(--font-display); font-size: 28px; color: var(--accent-warm); line-height: 1; }
+.merchantStatBox span { font-size: 12px; color: var(--muted); font-weight: 600; }
+.merchantFormsGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-bottom: 36px; }
+.merchantFormHead { margin-bottom: 8px; }
+.merchantFormHead h2 { display: flex; align-items: center; gap: 8px; margin: 4px 0 0; }
+.merchantFormHead .uiIcon { color: var(--accent-warm); }
+.geoHelperBox {
+  padding: 14px; border-radius: 14px; background: var(--surface-subtle);
+  border: 1px solid var(--line); display: grid; gap: 10px; margin: 8px 0;
+}
+.geoHelperTop { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.checkboxInline { display: inline-flex !important; align-items: center; gap: 8px; font-weight: 600; margin: 8px 0; }
+.checkboxInline input { width: 18px !important; height: 18px !important; min-height: 18px !important; }
+.merchantSection { margin-top: 34px; }
+.merchantStoresList, .merchantBookingsList { display: grid; gap: 18px; margin-top: 16px; }
+.merchantStoreCard {
+  padding: 24px; border-radius: 20px; border: 1px solid var(--line); background: var(--surface); display: grid; gap: 18px;
+}
+.merchantStoreHead { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.merchantStoreHead h3 { margin: 8px 0 4px; font-family: var(--font-display); font-size: 22px; }
+.merchantStoreAddr { margin: 0; font-size: 13px; color: var(--muted); }
+.merchantStoreLinks { display: flex; flex-wrap: wrap; gap: 8px; }
+.merchantMenuWrap h4 { margin: 0 0 12px; font-size: 14px; color: var(--ink); }
+.merchantMenuList { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.merchantMenuList li {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 14px; border-radius: 12px; background: var(--surface-subtle); border: 1px solid var(--line);
+}
+.merchantDishInfo { display: grid; gap: 2px; }
+.merchantDishInfo span { font-size: 12px; color: var(--muted); }
+.merchantEmptyMenu { margin: 0; font-size: 13px; color: var(--muted); }
+.btnSmall, .btnSmallDanger { min-height: 36px !important; padding: 6px 14px !important; font-size: 12px !important; }
+.btnSmallDanger:hover { border-color: #c54219; color: #c54219; }
+.merchantBookingCard {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 18px 20px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface);
+}
+.merchantBookingTop { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 4px; }
+.merchantBookingMain p { margin: 0; font-size: 13.5px; color: var(--muted); }
+.merchantBookingActions { display: flex; gap: 8px; }
+.statusPill { padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.status-pending { background: #fff2cc; color: #7a5412; }
+.status-confirmed { background: #e5f5ec; color: #165e3f; }
+.status-cancelled { background: #fdecea; color: #a93210; }
+@media (max-width: 900px) {
+  .merchantFormsGrid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .roleOptions { grid-template-columns: 1fr; }
+}

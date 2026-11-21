@@ -11,3 +11,4 @@ require_once __DIR__ . '/http.php';
 require_once __DIR__ . '/features.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/collection.php';
+require_once __DIR__ . '/merchant.php';

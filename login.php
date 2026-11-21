@@ -13,8 +13,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     }
     try {
         requireNomNomCsrf($payload);
-        loginNomNomAccount($db, validateAuthPayload(array_merge($payload, ['action' => 'login'])));
-        header('Location: ' . $returnTo); exit;
+        $account = loginNomNomAccount($db, validateAuthPayload(array_merge($payload, ['action' => 'login'])));
+        $hasExplicitReturn = isset($_GET['return']) || (isset($_POST['return']) && $_POST['return'] !== 'discover.php');
+        $target = (!$hasExplicitReturn && isNomNomMerchant($account)) ? 'merchant.php' : $returnTo;
+        header('Location: ' . $target); exit;
     } catch (InvalidArgumentException $exception) { $error = $exception->getMessage(); }
     catch (Throwable $exception) { error_log('Login failed: ' . $exception->getMessage()); $error = 'Không thể đăng nhập lúc này. Vui lòng thử lại.'; }
 }

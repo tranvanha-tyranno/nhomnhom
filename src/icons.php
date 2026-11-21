@@ -31,6 +31,7 @@ function uiIcon(string $name): string
         'book' => '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5v-13Z"/><path d="M8 7h8M8 11h6"/>',
         'star' => '<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9Z"/>',
         'check' => '<path d="m5 12 4.5 4.5L19 7"/>',
+        'store' => '<path d="M3 9.5 5 4h14l2 5.5a3 3 0 0 1-5 2.2 3 3 0 0 1-4 0 3 3 0 0 1-4 0A3 3 0 0 1 3 9.5Z"/><path d="M5 12.5V20h14v-7.5M10 20v-5h4v5"/>',
     ];
     return '<svg class="uiIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . ($paths[$name] ?? $paths['spark']) . '</svg>';
 }

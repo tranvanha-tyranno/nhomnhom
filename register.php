@@ -4,18 +4,37 @@ require_once __DIR__ . '/src/bootstrap.php';
 require_once __DIR__ . '/src/layout.php';
 $db = openDatabase(); $error = '';
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
-    try { requireNomNomCsrf($_POST); createNomNomAccount($db, validateAuthPayload(array_merge($_POST, ['action' => 'register']))); header('Location: discover.php'); exit; }
+    try {
+        requireNomNomCsrf($_POST);
+        $account = createNomNomAccount($db, validateAuthPayload(array_merge($_POST, ['action' => 'register'])));
+        header('Location: ' . (isNomNomMerchant($account) ? 'merchant.php' : 'discover.php'));
+        exit;
+    }
     catch (InvalidArgumentException $exception) { $error = $exception->getMessage(); }
     catch (Throwable $exception) { error_log('Registration failed: ' . $exception->getMessage()); $error = 'Không thể tạo tài khoản lúc này. Vui lòng thử lại.'; }
 }
+$selectedRole = (($_POST['role'] ?? $_GET['role'] ?? 'customer') === 'merchant') ? 'merchant' : 'customer';
 $csrfToken = nomnomCsrfToken();
 renderAuthHeader('Tạo tài khoản', true);
 ?>
-<div class="authHeading"><span class="brandMark"><?= uiIcon('brand') ?></span><h2>Mỗi khẩu vị, một hành trình.</h2><p>Tạo tài khoản và tìm những món dành riêng cho bạn.</p></div>
+<div class="authHeading"><span class="brandMark"><?= uiIcon('brand') ?></span><h2>Mỗi khẩu vị, một hành trình.</h2><p>Tạo tài khoản khách ăn uống hoặc đăng ký làm Chủ cửa hàng.</p></div>
 <form class="authCard" method="post">
     <?php if ($error): ?><p class="formError" role="alert"><?= htmlEscape($error) ?></p><?php endif; ?>
     <input type="hidden" name="csrfToken" value="<?= htmlEscape($csrfToken) ?>">
-    <label for="display-name">Tên của bạn</label>
+    <fieldset class="roleSelector">
+        <legend>Loại tài khoản</legend>
+        <div class="roleOptions">
+            <label class="roleOption">
+                <input type="radio" name="role" value="customer" <?= $selectedRole === 'customer' ? 'checked' : '' ?>>
+                <span class="roleCard"><?= uiIcon('user') ?><strong>Khách ăn uống</strong><small>Tìm món, lưu yêu thích & đặt bàn</small></span>
+            </label>
+            <label class="roleOption">
+                <input type="radio" name="role" value="merchant" <?= $selectedRole === 'merchant' ? 'checked' : '' ?>>
+                <span class="roleCard"><?= uiIcon('store') ?><strong>Chủ cửa hàng</strong><small>Tạo quán ăn, đăng thực đơn & duyệt bàn</small></span>
+            </label>
+        </div>
+    </fieldset>
+    <label for="display-name">Tên của bạn hoặc tên cửa hàng</label>
     <input id="display-name" name="displayName" maxlength="80" autocomplete="name" placeholder="Mọi người gọi bạn là gì?" required>
     <label for="email">Địa chỉ email</label>
     <input id="email" name="email" type="email" autocomplete="email" placeholder="ban@example.com" required>

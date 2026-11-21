@@ -117,21 +117,21 @@ function demoGroupBlueprints(): array
     ];
 }
 
-function upsertDemoAccount(PDO $db, string $email, string $displayName, string $passwordHash): array
+function upsertDemoAccount(PDO $db, string $email, string $displayName, string $passwordHash, string $role = 'customer'): array
 {
     $select = $db->prepare('SELECT id FROM nomnom_accounts WHERE email = ?');
     $select->execute([$email]);
     $existingId = (int) $select->fetchColumn();
     if ($existingId > 0) {
-        $db->prepare("UPDATE nomnom_accounts SET password_hash=?, display_name=?, status='active' WHERE id=?")
-            ->execute([$passwordHash, $displayName, $existingId]);
+        $db->prepare("UPDATE nomnom_accounts SET password_hash=?, display_name=?, role=?, status='active' WHERE id=?")
+            ->execute([$passwordHash, $displayName, $role, $existingId]);
         $accountId = $existingId;
     } else {
-        $db->prepare("INSERT INTO nomnom_accounts(email, password_hash, display_name, status) VALUES (?, ?, ?, 'active')")
-            ->execute([$email, $passwordHash, $displayName]);
+        $db->prepare("INSERT INTO nomnom_accounts(email, password_hash, display_name, role, status) VALUES (?, ?, ?, ?, 'active')")
+            ->execute([$email, $passwordHash, $displayName, $role]);
         $accountId = (int) $db->lastInsertId();
     }
-    return ['id' => $accountId, 'email' => $email, 'displayName' => $displayName, 'identityKey' => accountIdentityKey($accountId)];
+    return ['id' => $accountId, 'email' => $email, 'displayName' => $displayName, 'role' => $role, 'identityKey' => accountIdentityKey($accountId)];
 }
 
 function upsertDemoCoupons(PDO $db): int

@@ -28,7 +28,14 @@ function validateAuthPayload(array $input): array
     if ($action === 'register' && ($displayName === '' || strlen($displayName) > 80)) {
         throw new InvalidArgumentException('Tên hiển thị phải từ 1 đến 80 ký tự.');
     }
-    return compact('action', 'email', 'password', 'displayName');
+    $role = strtolower(trim((string) ($input['role'] ?? 'customer')));
+    if ($role === '') {
+        $role = 'customer';
+    }
+    if ($action === 'register' && !in_array($role, ['customer', 'merchant'], true)) {
+        throw new InvalidArgumentException('Loại tài khoản chỉ hỗ trợ Khách ăn uống hoặc Chủ cửa hàng.');
+    }
+    return compact('action', 'email', 'password', 'displayName', 'role');
 }
 
 function createNomNomAccount(PDO $db, array $payload): array
@@ -38,22 +45,35 @@ function createNomNomAccount(PDO $db, array $payload): array
     if ($exists->fetchColumn()) {
         throw new InvalidArgumentException('Email này đã được đăng ký.');
     }
-    $statement = $db->prepare('INSERT INTO nomnom_accounts(email, password_hash, display_name) VALUES (?, ?, ?)');
-    $statement->execute([$payload['email'], password_hash($payload['password'], PASSWORD_DEFAULT), $payload['displayName']]);
-    $account = ['id' => (int) $db->lastInsertId(), 'email' => $payload['email'], 'displayName' => $payload['displayName']];
+    $role = in_array(($payload['role'] ?? 'customer'), ['customer', 'merchant'], true)
+        ? (string) $payload['role']
+        : 'customer';
+    $statement = $db->prepare('INSERT INTO nomnom_accounts(email, password_hash, display_name, role) VALUES (?, ?, ?, ?)');
+    $statement->execute([$payload['email'], password_hash($payload['password'], PASSWORD_DEFAULT), $payload['displayName'], $role]);
+    $account = [
+        'id' => (int) $db->lastInsertId(),
+        'email' => $payload['email'],
+        'displayName' => $payload['displayName'],
+        'role' => $role,
+    ];
     startNomNomAccountSession($account);
     return $account;
 }
 
 function loginNomNomAccount(PDO $db, array $payload): array
 {
-    $statement = $db->prepare("SELECT id, email, password_hash, display_name FROM nomnom_accounts WHERE email=? AND status='active'");
+    $statement = $db->prepare("SELECT id, email, password_hash, display_name, role FROM nomnom_accounts WHERE email=? AND status='active'");
     $statement->execute([$payload['email']]);
     $row = $statement->fetch();
     if (!$row || !password_verify($payload['password'], (string) $row['password_hash'])) {
         throw new InvalidArgumentException('Email hoặc mật khẩu không đúng.');
     }
-    $account = ['id' => (int) $row['id'], 'email' => (string) $row['email'], 'displayName' => (string) $row['display_name']];
+    $account = [
+        'id' => (int) $row['id'],
+        'email' => (string) $row['email'],
+        'displayName' => (string) $row['display_name'],
+        'role' => (string) ($row['role'] ?? 'customer'),
+    ];
     startNomNomAccountSession($account);
     return $account;
 }
@@ -61,10 +81,13 @@ function loginNomNomAccount(PDO $db, array $payload): array
 function startNomNomAccountSession(array $account): void
 {
     nomnomSessionKey();
-    session_regenerate_id(true);
+    if (!headers_sent()) {
+        session_regenerate_id(true);
+    }
     $_SESSION['account_id'] = $account['id'];
     $_SESSION['account_email'] = $account['email'];
     $_SESSION['account_name'] = $account['displayName'];
+    $_SESSION['account_role'] = (string) ($account['role'] ?? 'customer');
     nomnomCsrfToken();
 }
 
@@ -73,10 +96,30 @@ function currentNomNomAccount(PDO $db): ?array
     nomnomSessionKey();
     $id = (int) ($_SESSION['account_id'] ?? 0);
     if ($id < 1) return null;
-    $statement = $db->prepare("SELECT id, email, display_name AS displayName FROM nomnom_accounts WHERE id=? AND status='active'");
+    $statement = $db->prepare("SELECT id, email, display_name AS displayName, role FROM nomnom_accounts WHERE id=? AND status='active'");
     $statement->execute([$id]);
     $account = $statement->fetch();
-    return $account ? ['id' => (int) $account['id'], 'email' => (string) $account['email'], 'displayName' => (string) $account['displayName']] : null;
+    return $account ? [
+        'id' => (int) $account['id'],
+        'email' => (string) $account['email'],
+        'displayName' => (string) $account['displayName'],
+        'role' => (string) ($account['role'] ?? 'customer'),
+    ] : null;
+}
+
+function isNomNomMerchant(?array $account): bool
+{
+    return $account !== null && in_array((string) ($account['role'] ?? 'customer'), ['merchant', 'admin'], true);
+}
+
+function requireNomNomMerchant(PDO $db): array
+{
+    $account = requireNomNomAccount($db);
+    if (!isNomNomMerchant($account)) {
+        http_response_code(403);
+        throw new InvalidArgumentException('Tài khoản hiện tại không có quyền Cửa hàng.');
+    }
+    return $account;
 }
 
 function requireNomNomAccount(PDO $db): array

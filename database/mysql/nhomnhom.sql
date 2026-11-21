@@ -1,5 +1,5 @@
 -- NhomNhom MySQL 8 dump generated from SQLite
--- Generated at 2026-11-21T05:15:10.420327+00:00
+-- Generated at 2026-11-21T06:21:09.730037+00:00
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS=0;
 CREATE DATABASE IF NOT EXISTS `nhomnhom` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -321,8 +321,16 @@ CREATE TABLE IF NOT EXISTS `nomnom_accounts` (
   `display_name` VARCHAR(255) NOT NULL,
   `status` VARCHAR(255) NOT NULL DEFAULT 'active',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `role` VARCHAR(255) NOT NULL DEFAULT 'customer',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_nomnom_accounts_email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS `nomnom_merchant_restaurants` (
+  `account_id` BIGINT,
+  `restaurant_id` BIGINT,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`account_id`, `restaurant_id`),
+  UNIQUE KEY `uniq_nomnom_merchant_restaurants_restaurant_id` (`restaurant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Foreign keys
@@ -367,6 +375,8 @@ ALTER TABLE `nomnom_group_votes` ADD CONSTRAINT `fk_nomnom_group_votes_group_id_
 ALTER TABLE `nomnom_bookings` ADD CONSTRAINT `fk_nomnom_bookings_restaurant_id_id` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants` (`id`);
 ALTER TABLE `nomnom_coupons` ADD CONSTRAINT `fk_nomnom_coupons_restaurant_id_id` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants` (`id`) ON DELETE CASCADE;
 ALTER TABLE `nomnom_dish_elo` ADD CONSTRAINT `fk_nomnom_dish_elo_dish_id_id` FOREIGN KEY (`dish_id`) REFERENCES `dishes` (`id`) ON DELETE CASCADE;
+ALTER TABLE `nomnom_merchant_restaurants` ADD CONSTRAINT `fk_nomnom_merchant_restaurants_restaurant_id_id` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants` (`id`) ON DELETE CASCADE;
+ALTER TABLE `nomnom_merchant_restaurants` ADD CONSTRAINT `fk_nomnom_merchant_restaurants_account_id_id` FOREIGN KEY (`account_id`) REFERENCES `nomnom_accounts` (`id`) ON DELETE CASCADE;
 
 -- Indexes
 CREATE INDEX `idx_restaurants_status` ON `restaurants` (`status`, `id`);
@@ -617644,12 +617654,18 @@ INSERT INTO `nomnom_dish_elo` (`dish_id`, `rating`, `wins`, `losses`, `updated_a
 (15, 1208, 1, 0, '2026-11-20 19:20:59');
 
 -- nomnom_accounts
-INSERT INTO `nomnom_accounts` (`id`, `email`, `password_hash`, `display_name`, `status`, `created_at`) VALUES
-(1, 'test@nhomnhom.local', '$2y$10$BHRRg0X8oVAFTgqQfB0d1u/XkWK.Un0KP5gnogdvi6oYPz9pbIEbq', 'Người dùng Test', 'active', '2026-11-20 16:19:39'),
-(2, 'minh.anh@nhomnhom.vn', '$2y$10$BHRRg0X8oVAFTgqQfB0d1u/XkWK.Un0KP5gnogdvi6oYPz9pbIEbq', 'Minh Anh', 'active', '2026-11-20 19:20:59'),
-(3, 'hoang.nam@nhomnhom.vn', '$2y$10$BHRRg0X8oVAFTgqQfB0d1u/XkWK.Un0KP5gnogdvi6oYPz9pbIEbq', 'Hoàng Nam', 'active', '2026-11-20 19:20:59'),
-(4, 'thu.ha@nhomnhom.vn', '$2y$10$BHRRg0X8oVAFTgqQfB0d1u/XkWK.Un0KP5gnogdvi6oYPz9pbIEbq', 'Thu Hà', 'active', '2026-11-20 19:20:59'),
-(5, 'quoc.bao@nhomnhom.vn', '$2y$10$BHRRg0X8oVAFTgqQfB0d1u/XkWK.Un0KP5gnogdvi6oYPz9pbIEbq', 'Quốc Bảo', 'active', '2026-11-20 19:20:59');
+INSERT INTO `nomnom_accounts` (`id`, `email`, `password_hash`, `display_name`, `status`, `created_at`, `role`) VALUES
+(1, 'test@nhomnhom.local', '$2y$10$BHRRg0X8oVAFTgqQfB0d1u/XkWK.Un0KP5gnogdvi6oYPz9pbIEbq', 'Người dùng Test', 'active', '2026-11-20 16:19:39', 'customer'),
+(2, 'minh.anh@nhomnhom.vn', '$2y$10$BHRRg0X8oVAFTgqQfB0d1u/XkWK.Un0KP5gnogdvi6oYPz9pbIEbq', 'Minh Anh', 'active', '2026-11-20 19:20:59', 'customer'),
+(3, 'hoang.nam@nhomnhom.vn', '$2y$10$BHRRg0X8oVAFTgqQfB0d1u/XkWK.Un0KP5gnogdvi6oYPz9pbIEbq', 'Hoàng Nam', 'active', '2026-11-20 19:20:59', 'customer'),
+(4, 'thu.ha@nhomnhom.vn', '$2y$10$BHRRg0X8oVAFTgqQfB0d1u/XkWK.Un0KP5gnogdvi6oYPz9pbIEbq', 'Thu Hà', 'active', '2026-11-20 19:20:59', 'customer'),
+(5, 'quoc.bao@nhomnhom.vn', '$2y$10$BHRRg0X8oVAFTgqQfB0d1u/XkWK.Un0KP5gnogdvi6oYPz9pbIEbq', 'Quốc Bảo', 'active', '2026-11-20 19:20:59', 'customer'),
+(6, 'quan@nhomnhom.vn', '$2y$10$gAOM9GbNAtl5SLID.Ot4q.RHfXOzqVBiCNnCC.2o/IlrAdOuDudVK', 'Chủ quán Quận 7', 'active', '2026-11-21 06:21:02', 'merchant');
+
+-- nomnom_merchant_restaurants
+INSERT INTO `nomnom_merchant_restaurants` (`account_id`, `restaurant_id`, `created_at`) VALUES
+(6, 5001, '2026-11-21 06:21:02'),
+(6, 5002, '2026-11-21 06:21:02');
 
 CREATE OR REPLACE VIEW `restaurant_rating_summary` AS SELECT id AS restaurant_id, review_count, CASE WHEN review_count=0 THEN 0.0 ELSE ROUND(rating_sum/review_count, 1) END AS average_rating FROM restaurants;
 SET FOREIGN_KEY_CHECKS=1;

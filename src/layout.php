@@ -16,7 +16,7 @@ function renderDocumentStart(string $title, string $bodyClass = ''): void
     echo '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>';
     echo '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">';
     echo '<script>(function(){try{var t=localStorage.getItem("nhomnhom-theme");if(!t&&window.matchMedia("(prefers-color-scheme:dark)").matches)t="dark";if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}})();</script>';
-    echo '<link rel="stylesheet" href="assets/app.css?v=20261119"><link rel="stylesheet" href="assets/redesign.css?v=20261119"><link rel="stylesheet" href="assets/upgrade.css?v=20261121">';
+    echo '<link rel="stylesheet" href="assets/app.css?v=20261119"><link rel="stylesheet" href="assets/redesign.css?v=20261119"><link rel="stylesheet" href="assets/upgrade.css?v=20261121b">';
     echo '<script src="assets/client.js?v=20261119" defer></script><script src="assets/ui.js?v=20261119" defer></script></head><body class="' . $bodyClass . '">';
     echo '<a class="skipLink" href="#main-content">Đến nội dung chính</a>';
 }
@@ -38,6 +38,9 @@ function renderPageHeader(PDO $db, string $title, string $active = ''): void
         'insights.php' => ['trend', 'Xu hướng'],
         'profile.php' => ['user', 'Khẩu vị'],
     ];
+    if (function_exists('isNomNomMerchant') && isNomNomMerchant($account)) {
+        $links['merchant.php'] = ['store', 'Cửa hàng'];
+    }
     renderDocumentStart($title);
     echo '<div class="appShell"><div class="workspace"><header class="siteNav"><div class="topbarTitle"><button class="menuToggle" type="button" aria-label="Mở điều hướng" aria-expanded="false" aria-controls="site-sidebar">' . uiIcon('menu') . '</button>';
     renderBrand();

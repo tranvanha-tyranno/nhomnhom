@@ -305,14 +305,20 @@ function refreshVerifiedSearchIndex(PDO $db, array $restaurantIds): void
     if (isMysqlConnection($db) || empty($restaurantIds)) {
         return;
     }
+    $docStmt = $db->prepare('SELECT id, name, content FROM catalog_search_documents WHERE id = ?');
     $del = $db->prepare('DELETE FROM restaurant_search WHERE rowid = ?');
-    $ins = $db->prepare(
-        'INSERT INTO restaurant_search(rowid, name, content)
-         SELECT id, name, content FROM catalog_search_documents WHERE id = ?'
-    );
+    $ins = $db->prepare('INSERT INTO restaurant_search(rowid, name, content) VALUES (?, ?, ?)');
     foreach ($restaurantIds as $id) {
+        $docStmt->execute([$id]);
+        $doc = $docStmt->fetch();
         $del->execute([$id]);
-        $ins->execute([$id]);
+        if ($doc) {
+            $ins->execute([
+                (int) $doc['id'],
+                normalizeSearchText((string) $doc['name']),
+                normalizeSearchText((string) $doc['content']),
+            ]);
+        }
     }
 }
 
