@@ -2,7 +2,7 @@
 
 ## Project Identity
 - Project: nhomnhom
-- Stack: TypeScript / JavaScript (React, Next.js, Node.js)
+- Stack: PHP 8.1+ / HTML / CSS / JavaScript (Apache/XAMPP, PDO SQLite)
 - Purpose: [Tìm kiếm món ăn yêu thích và sau đó chỉ đường GG map dựa theo yêu thích trên web]
 - Harness: Codex (VSCode extension) — no hook system, no subagent system like Claude Code. All rules below are instruction-based.
 
@@ -30,7 +30,7 @@
 
 **File organization:** many small files over few large ones. 200-300 lines typical, 500 lines max. Organize by feature/domain, not by file type.
 
-**Naming:** camelCase for functions/variables, PascalCase for components/classes. 1 React component = 1 file.
+**Naming:** camelCase for PHP/JavaScript functions and variables, PascalCase for classes. Keep PHP files focused by feature.
 
 **Error handling:** handle errors at every level. User-friendly messages in UI, detailed logs server-side. Never silently swallow errors in empty catch blocks.
 
@@ -44,7 +44,7 @@
 
 ## Testing Requirements
 
-**Test framework:** Jest or Vitest (depending on Next.js version)
+**Test framework:** PHP CLI smoke tests in `tests/php/`; use the XAMPP PHP binary when PHP is not in PATH.
 
 Required test types:
 1. **Unit tests** — individual functions, utilities, components

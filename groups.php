@@ -1,0 +1,10 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__ . '/src/bootstrap.php'; require_once __DIR__ . '/src/layout.php';
+$db = openDatabase(); requireNomNomAccount($db); renderPageHeader($db, 'Nhóm bạn', 'groups.php');
+?>
+<section class="pageHero compact"><span class="sectionEyebrow">Chọn món cùng nhau</span><h1>Một món ngon hơn<br> <em>khi cả nhóm cùng thích.</em></h1><p>Tạo mã nhóm và gửi cho bạn bè. Mỗi người bình chọn món mình muốn ăn.</p></section>
+<section class="splitPage"><div class="formCard"><h2>Tạo hoặc tham gia nhóm</h2><label>Tên hiển thị<input id="group-name" maxlength="80" placeholder="Tên của bạn"></label><div class="inlineForm"><button class="likeButton" id="create-group" type="button">Tạo nhóm mới</button><button class="outlineButton" id="join-group" type="button">Tham gia</button></div><label>Mã nhóm<input id="group-code" maxlength="8" placeholder="8 ký tự từ người tạo nhóm"></label><p id="group-message" class="formMessage" role="status"></p></div><div class="formCard groupResultCard"><span class="sectionEyebrow">Kết quả chung</span><h2>Món cả nhóm cùng thích</h2><div id="group-result"><p class="emptyState">Nhập mã nhóm để xem kết quả.</p></div></div></section>
+<section class="groupVoting" id="group-voting" hidden aria-labelledby="vote-title"><div class="sectionHeading"><div><h2 id="vote-title">Cả hội muốn ăn món nào?</h2><p>Bình chọn riêng cho nhóm. Bạn có thể đổi lựa chọn bất cứ lúc nào.</p></div><div class="inlineForm"><button type="button" class="outlineButton" id="copy-group">Sao chép mã</button><button type="button" class="outlineButton" id="refresh-group">Cập nhật kết quả</button></div></div><label class="searchBox"><?= uiIcon('search') ?><span class="srOnly">Tìm món để bình chọn</span><input type="search" id="group-dish-query" maxlength="80" placeholder="Tìm món để cả nhóm bình chọn…"></label><div id="group-dishes" class="resultsGrid" aria-live="polite"></div><button class="outlineButton" id="more-group-dishes" type="button">Xem món tiếp theo</button></section>
+<script src="assets/groups.js?v=20261116" defer></script>
+<?php renderPageFooter('groups.php'); ?>

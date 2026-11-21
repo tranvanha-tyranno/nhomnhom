@@ -1,17 +1,28 @@
-[2026-06-30] ACTION: added TDD project skeleton and failing food search tests | package.json, tsconfig.json, vitest.config.ts, .gitignore, src/lib/foodSearch.test.ts | next step implement search/data/maps modules
-[2026-06-30] ACTION: installed npm dependencies and generated lockfile | package-lock.json | next step review npm audit findings before implementation
-[2026-06-30] ACTION: added PostCSS override to address npm audit warning | package.json | next step refresh lockfile and rerun audit
-[2026-06-30] ACTION: refreshed dependency lockfile after PostCSS override | package-lock.json | next step rerun audit then execute RED test
-[2026-06-30] ACTION: implemented food place data, accent-insensitive search, and Google Maps URL builder | src/lib/foodPlaces.ts, src/lib/foodSearch.ts, src/lib/maps.ts | next step run unit tests and scaffold UI
-[2026-06-30] ACTION: generated and added local Vietnamese food banner asset | public/images/food-banner.png | next step build Next.js UI around search flow
-[2026-06-30] ACTION: added lucide-react dependency for UI icons | package.json | next step install dependency and update lockfile
-[2026-06-30] ACTION: installed lucide-react and refreshed lockfile | package-lock.json | next step implement App Router UI
-[2026-06-30] ACTION: built App Router UI for food search and Google Maps directions | next-env.d.ts, next.config.ts, tsconfig.json, src/app/layout.tsx, src/app/page.tsx, src/app/globals.css, src/features/food-search/* | next step run tests and production build
-[2026-06-30] ACTION: verified unit tests, npm audit, and production build all pass | npm test, npm audit --audit-level=moderate, npm run build | next step start local dev server for manual testing
-[2026-06-30] ACTION: tightened responsive layout and ignored local screenshot artifacts | src/app/globals.css, .gitignore | next step rerun build and screenshot checks
-[2026-06-30] ACTION: added extra mobile overflow guards for panels and long text | src/app/globals.css | next step rerun final verification
-[2026-06-30] ACTION: reran final test, audit, dev URL smoke check, and production build successfully | npm test, npm audit --audit-level=moderate, npm run build, http://127.0.0.1:3000 | next step self-review diff before handoff
-[2026-06-30] ACTION: completed self-review with no secret findings and files under size limits | git status, rg secret scan, src file line counts | next step hand off running app URL
-[2026-06-30] ACTION: added Docker production setup with standalone Next.js output | Dockerfile, .dockerignore, docker-compose.yml, next.config.ts | next step build image and smoke test container
-[2026-06-30] ACTION: verified tests, audit, Next standalone build, and compose config; Docker image build blocked because daemon is not running | npm test, npm audit --audit-level=moderate, npm run build, docker compose config, docker build | next step start Docker Desktop then run docker compose up --build
-[2026-08-01] ACTION: added a validated TensorFlow.js CNN image classifier with architecture tests, patched audited dependencies, and ignored TypeScript build cache | src/lib/cnnModel.ts, src/lib/cnnModel.test.ts, package.json, package-lock.json, .gitignore | next step provide a labeled image dataset before adding training and UI inference flows
+# MEMORY
+
+## SUMMARY
+[2026-11-21] ACTION: recreated 13-slide NhomNhom presentation using official TDTU 503073 Wisp Slide Master from 4x.rar (TDTU logo, radial sage background, left botanical curves, red pentagon bullets, outline, footer) reusing all v2 rounded device mockups, fixing v2 text overlaps, updating to 8/8 tests + 5 demo accounts, and visually verifying all 13 slides via PowerPoint PNG export | NhomNhom-Presentation-TDTU.pptx | next step user review
+[2026-11-21] ACTION: seeded 5 pre-configured accounts with profiles, 20 likes (5 skips), Elo ratings, 3 coupons, 11 bookings, and 2 voting groups into SQLite and regenerated MySQL dump; added idempotent demo seeder and 8th PHP test suite | src/demo_seed.php, scripts/seed_demo_accounts.php, tests/php/demo_seed_test.php, data/nhomnhom.sqlite, database/mysql/nhomnhom.sql, README.md | next step deploy to server
+[2026-11-20] ACTION: redesigned minimal Keynote-style 11-slide deck with Pillow anti-aliased rounded device mockups, soft studio drop shadows, cropped scrollbars, and ~70% less text | NhomNhom-Presentation-v2.pptx | next step user review
+[2026-11-19] ACTION: installed 3 skills (frontend-design, ui-ux-pro-max, web-design-guidelines) and shipped full UI/UX + feature upgrade (Dark/Light mode, SVG icons, skeleton/toast, mobile bottom nav, restaurant detail+menu, smart filters+geolocation distance, discover card/grid+roulette+shortcuts, insights dual Elo dashboard, profile stats) | .agents/skills/*, restaurant.php, api/restaurant.php, src/restaurant_detail.php, src/restaurants.php, src/features.php, src/icons.php, src/layout.php, assets/upgrade.css, assets/*.js, tests/php/upgrade_test.php | next step user visual review at http://127.0.0.1:8092/
+[2026-11-16] ACTION: rebuilt all 9 screens with citrus/forest styling, responsive top navigation, food-category search and local assets | index.php, src/layout.php, assets/redesign.css, assets/favicon.svg | next step gather visual feedback
+[2026-11-16] ACTION: shipped filtered random meal selection and usable group voting/search/share/refresh with restaurant handoff | src/discovery.php, discover.php, groups.php, assets/discover.js, assets/groups.js, assets/search.js | next step import verified restaurant data
+
+## ACTIVE
+None.
+
+## VERIFICATION
+[2026-11-16] ACTION: final browser verified 9 distinct group choices, saved vote and no mobile overflow; visually reviewed final group board; preview remains running at 8091 with project DB | output/playwright/group-voting-desktop.png, output/playwright/group-voting-mobile.png | next step user review; no production deployment performed
+[2026-11-16] ACTION: distinct-catalog RED/GREEN confirmed; all 6 PHP suites pass and live API returns 9 distinct dishes out of 120; syntax checks passed | tests/php/product_flow_test.php, api/group-dishes.php | next step inspect final group screenshot
+[2026-11-16] ACTION: fixed duplicate group choices with grouped dish catalog, minimum price and pagination before client rendering | src/discovery.php, api/group-dishes.php, assets/groups.js, README.md | next step rerun regression and group browser QA
+[2026-11-16] ACTION: visual QA found duplicate menu rows reducing group ballot variety; added distinct-catalog regression | tests/php/product_flow_test.php | next step implement grouped catalog query
+[2026-11-16] ACTION: all 6 PHP suites, PHP/JS syntax and diff whitespace checks passed; browser verified 7 flows and 30 responsive page checks with no JS errors; QA used copied DB, preview HTTP 200 and filtered random API succeeded on project DB; archived October notes and documented scoped legal release gaps | tests/php/*, output/playwright/*, README.md, CHANGELOG.md | next step preview http://127.0.0.1:8091/ (server session 63075); MySQL and actual restaurant confirmation remain unverified
+[2026-11-16] ACTION: browser flows and 18 viewport checks reached final menu assertion; corrected test to wait for menu transition, fixed mobile account overlap and documented local release/legal limitations | assets/redesign.css, README.md, output/playwright/redesign-qa.js | next step verify final menu and layouts
+[2026-11-16] ACTION: completed group dish search/voting, replaceable votes, copy invite code, refresh results and restaurant handoff | assets/groups.js, assets/search.js, assets/redesign.css | next step verify group flow in browser
+[2026-11-16] ACTION: added member-only group-vote regression checks and prepared voting/search/share UI using existing APIs | groups.php, tests/php/product_flow_test.php, src/layout.php | next step wire group interactions
+[2026-11-16] ACTION: six PHP suites passed; fixed Vietnamese surprise copy and exposed selected food category state | discover.php, assets/search.js | next step inspect live UI
+[2026-11-16] ACTION: corrected Windows pipeline encoding by writing Vietnamese UI via UTF-8 patch | index.php, src/layout.php, assets/discover.js | next step verify rendered content
+[2026-11-16] ACTION: applied citrus/forest visual system to all pages, responsive top navigation, food hero, mood search and authentication | assets/redesign.css | next step run PHP suites and desktop/mobile QA
+[2026-11-16] ACTION: observed RED test, implemented allowlisted single-result random SQL with dietary/budget/spice integration coverage | src/discovery.php, tests/php/product_flow_test.php | next step build new interface
+
+[2026-11-16] ACTION: rebuilt home, shared top navigation and discovery surprise interaction with existing API/auth boundaries preserved | index.php, src/layout.php, discover.php, assets/discover.js, assets/search.js, assets/favicon.svg | next step style and browser QA

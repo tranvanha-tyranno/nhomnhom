@@ -1,0 +1,8 @@
+Options -Indexes
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(?:src|includes|data|database|scripts|tests|docs)(?:/|$) - [F,L]
+</IfModule>
+<FilesMatch "\.(sqlite|sqlite3|db|db-wal|db-shm)$">
+  Require all denied
+</FilesMatch>
