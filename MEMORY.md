@@ -1,6 +1,7 @@
 # MEMORY
 
 ## SUMMARY
+[2026-11-21] ACTION: added 24 verified Vietnamese restaurants (is_demo=0) with real GPS coordinates & Google Maps directions across HCMC (District 7 near TDTU, Q1/Q3/Q5/Phu Nhuan/Thu Duc), Hanoi, Da Nang, Hue, and Da Lat; added idempotent seeder, 9th PHP test suite, and updated SQLite + MySQL dump | src/verified_seed.php, scripts/seed_verified_restaurants.php, tests/php/verified_seed_test.php, database/mysql/nhomnhom.sql | next step pull & seed on server
 [2026-11-21] ACTION: fixed Docker login/register CSRF failure by initializing session/CSRF before renderAuthHeader HTML output, configuring output_buffering=4096 and writable /var/lib/php/sessions in Dockerfile, and adding auth CSRF regression tests | login.php, register.php, src/layout.php, Dockerfile, tests/php/auth_test.php | next step pull and rebuild on server
 [2026-11-21] ACTION: added PHP 8.2-Apache + MariaDB 11 Docker deployment stack (port 9901, auto-import nhomnhom.sql, healthcheck, .htaccess protection) and pushed to GitHub main | Dockerfile, docker-compose.yml, .dockerignore | next step docker compose up on server
 [2026-11-21] ACTION: recreated 13-slide NhomNhom presentation using official TDTU 503073 Wisp Slide Master from 4x.rar (TDTU logo, radial sage background, left botanical curves, red pentagon bullets, outline, footer) reusing all v2 rounded device mockups, fixing v2 text overlaps, updating to 8/8 tests + 5 demo accounts, and visually verifying all 13 slides via PowerPoint PNG export | NhomNhom-Presentation-TDTU.pptx | next step user review
