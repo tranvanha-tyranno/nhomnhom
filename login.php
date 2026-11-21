@@ -18,12 +18,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     } catch (InvalidArgumentException $exception) { $error = $exception->getMessage(); }
     catch (Throwable $exception) { error_log('Login failed: ' . $exception->getMessage()); $error = 'Không thể đăng nhập lúc này. Vui lòng thử lại.'; }
 }
+$csrfToken = nomnomCsrfToken();
 renderAuthHeader('Đăng nhập');
 ?>
 <div class="authHeading"><span class="brandMark"><?= uiIcon('brand') ?></span><h2>Chào bạn, lại là NhomNhom.</h2><p>Đăng nhập để tiếp tục hành trình khám phá món ngon.</p></div>
 <form class="authCard" method="post">
     <?php if ($error): ?><p class="formError" role="alert"><?= htmlEscape($error) ?></p><?php endif; ?>
-    <input type="hidden" name="csrfToken" value="<?= htmlEscape(nomnomCsrfToken()) ?>">
+    <input type="hidden" name="csrfToken" value="<?= htmlEscape($csrfToken) ?>">
     <input type="hidden" name="return" value="<?= htmlEscape($returnTo) ?>">
     <label for="email">Địa chỉ email</label>
     <input id="email" name="email" type="email" autocomplete="email" placeholder="ban@example.com" required>

@@ -8,12 +8,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     catch (InvalidArgumentException $exception) { $error = $exception->getMessage(); }
     catch (Throwable $exception) { error_log('Registration failed: ' . $exception->getMessage()); $error = 'Không thể tạo tài khoản lúc này. Vui lòng thử lại.'; }
 }
+$csrfToken = nomnomCsrfToken();
 renderAuthHeader('Tạo tài khoản', true);
 ?>
 <div class="authHeading"><span class="brandMark"><?= uiIcon('brand') ?></span><h2>Mỗi khẩu vị, một hành trình.</h2><p>Tạo tài khoản và tìm những món dành riêng cho bạn.</p></div>
 <form class="authCard" method="post">
     <?php if ($error): ?><p class="formError" role="alert"><?= htmlEscape($error) ?></p><?php endif; ?>
-    <input type="hidden" name="csrfToken" value="<?= htmlEscape(nomnomCsrfToken()) ?>">
+    <input type="hidden" name="csrfToken" value="<?= htmlEscape($csrfToken) ?>">
     <label for="display-name">Tên của bạn</label>
     <input id="display-name" name="displayName" maxlength="80" autocomplete="name" placeholder="Mọi người gọi bạn là gì?" required>
     <label for="email">Địa chỉ email</label>

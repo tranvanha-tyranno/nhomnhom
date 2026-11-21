@@ -33,4 +33,26 @@ assertAuth('discover.php', safeNomNomReturn('//example.com'), 'Protocol-relative
 assertAuth('discover.php', safeNomNomReturn(['invalid']), 'Array redirects must be rejected');
 assertAuth('/nhomnhom/bookings.php?restaurant=1', safeNomNomReturn('/nhomnhom/bookings.php?restaurant=1'), 'Local booking selection must survive login');
 
+// Regression: session/CSRF must initialize BEFORE any HTML output (Docker php:8.2-apache has output_buffering=0).
+$loginSource = (string) file_get_contents(__DIR__ . '/../../login.php');
+$registerSource = (string) file_get_contents(__DIR__ . '/../../register.php');
+$layoutSource = (string) file_get_contents(__DIR__ . '/../../src/layout.php');
+assertAuth(
+    true,
+    strpos($loginSource, 'nomnomCsrfToken()') !== false
+        && strpos($loginSource, 'nomnomCsrfToken()') < strpos($loginSource, 'renderAuthHeader('),
+    'login.php must initialize CSRF session before renderAuthHeader outputs HTML'
+);
+assertAuth(
+    true,
+    strpos($registerSource, 'nomnomCsrfToken()') !== false
+        && strpos($registerSource, 'nomnomCsrfToken()') < strpos($registerSource, 'renderAuthHeader('),
+    'register.php must initialize CSRF session before renderAuthHeader outputs HTML'
+);
+assertAuth(
+    true,
+    preg_match('/function renderAuthHeader[\s\S]*?nomnomCsrfToken\(\);[\s\S]*?renderDocumentStart\(/', $layoutSource) === 1,
+    'renderAuthHeader must initialize CSRF session before renderDocumentStart outputs HTML'
+);
+
 fwrite(STDOUT, "PHP auth tests passed\n");

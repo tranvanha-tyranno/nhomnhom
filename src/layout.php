@@ -78,6 +78,9 @@ function renderPageFooter(string $active = ''): void
 
 function renderAuthHeader(string $title, bool $register = false): void
 {
+    if (function_exists('nomnomCsrfToken') && !headers_sent()) {
+        nomnomCsrfToken();
+    }
     renderDocumentStart($title, 'authBody');
     echo '<main class="authShell" id="main-content"><section class="authStory">';
     renderBrand();
