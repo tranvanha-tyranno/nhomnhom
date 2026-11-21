@@ -1,6 +1,7 @@
 # MEMORY
 
 ## SUMMARY
+[2026-11-21] ACTION: added PHP 8.2-Apache + MariaDB 11 Docker deployment stack (port 9901, auto-import nhomnhom.sql, healthcheck, .htaccess protection) and pushed to GitHub main | Dockerfile, docker-compose.yml, .dockerignore | next step docker compose up on server
 [2026-11-21] ACTION: recreated 13-slide NhomNhom presentation using official TDTU 503073 Wisp Slide Master from 4x.rar (TDTU logo, radial sage background, left botanical curves, red pentagon bullets, outline, footer) reusing all v2 rounded device mockups, fixing v2 text overlaps, updating to 8/8 tests + 5 demo accounts, and visually verifying all 13 slides via PowerPoint PNG export | NhomNhom-Presentation-TDTU.pptx | next step user review
 [2026-11-21] ACTION: seeded 5 pre-configured accounts with profiles, 20 likes (5 skips), Elo ratings, 3 coupons, 11 bookings, and 2 voting groups into SQLite and regenerated MySQL dump; added idempotent demo seeder and 8th PHP test suite | src/demo_seed.php, scripts/seed_demo_accounts.php, tests/php/demo_seed_test.php, data/nhomnhom.sqlite, database/mysql/nhomnhom.sql, README.md | next step deploy to server
 [2026-11-20] ACTION: redesigned minimal Keynote-style 11-slide deck with Pillow anti-aliased rounded device mockups, soft studio drop shadows, cropped scrollbars, and ~70% less text | NhomNhom-Presentation-v2.pptx | next step user review

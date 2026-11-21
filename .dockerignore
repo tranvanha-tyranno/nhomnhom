@@ -1,0 +1,16 @@
+.git
+.gitignore
+.env*
+.agents
+.playwright-cli
+output
+backups
+data
+database
+docs
+tmp
+tests
+4x.rar
+*.pptx
+*.log
+__pycache__

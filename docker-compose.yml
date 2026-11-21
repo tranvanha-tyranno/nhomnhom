@@ -1,0 +1,40 @@
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${NHOMNHOM_DB_NAME:-nhomnhom}
+      MARIADB_USER: ${NHOMNHOM_DB_USER:-nhomnhom}
+      MARIADB_PASSWORD: ${NHOMNHOM_DB_PASSWORD:-nhomnhom_local_pw}
+      MARIADB_ROOT_PASSWORD: ${NHOMNHOM_DB_ROOT_PASSWORD:-nhomnhom_root_local_pw}
+      TZ: Asia/Ho_Chi_Minh
+    volumes:
+      - nhomnhom_db_data:/var/lib/mysql
+      - ./database/mysql/nhomnhom.sql:/docker-entrypoint-initdb.d/01-nhomnhom.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  web:
+    build:
+      context: .
+    image: nhomnhom:latest
+    restart: unless-stopped
+    ports:
+      - "${NHOMNHOM_PORT:-9901}:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NHOMNHOM_DB_DRIVER: mysql
+      NHOMNHOM_DB_HOST: db
+      NHOMNHOM_DB_PORT: "3306"
+      NHOMNHOM_DB_NAME: ${NHOMNHOM_DB_NAME:-nhomnhom}
+      NHOMNHOM_DB_USER: ${NHOMNHOM_DB_USER:-nhomnhom}
+      NHOMNHOM_DB_PASSWORD: ${NHOMNHOM_DB_PASSWORD:-nhomnhom_local_pw}
+
+volumes:
+  nhomnhom_db_data:
