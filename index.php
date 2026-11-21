@@ -73,7 +73,7 @@ renderPageHeader($db, 'Trang chủ', 'index.php');
   </div>
  </div>
  <div class="searchOptions">
-  <div class="quickQueryRow"><span>Gợi ý:</span><button class="quickQuery" data-query="bún bò" type="button">Bún bò</button><button class="quickQuery" data-query="phở" type="button">Phở</button><button class="quickQuery" data-query="chay" type="button">Món chay</button><button class="quickQuery" data-query="cơm tấm" type="button">Cơm tấm</button></div>
+  <div class="quickQueryRow"><span>Gợi ý:</span><button class="quickQuery" data-query="Quận 7" type="button">Quận 7</button><button class="quickQuery" data-query="bún bò" type="button">Bún bò</button><button class="quickQuery" data-query="phở" type="button">Phở</button><button class="quickQuery" data-query="chay" type="button">Món chay</button><button class="quickQuery" data-query="cơm tấm" type="button">Cơm tấm</button></div>
  </div>
  <div id="results" aria-live="polite" aria-busy="true"><p class="emptyState">Đang tìm nhà hàng…</p></div>
 </section>
@@ -98,5 +98,5 @@ renderPageHeader($db, 'Trang chủ', 'index.php');
  <a href="bookings.php"><?= uiIcon('calendar') ?><div><h3>Đừng quên cuộc hẹn</h3><p>Lên lịch và quản lý yêu cầu đặt bàn.</p></div><?= uiIcon('arrow') ?></a>
  <a href="profile.php"><?= uiIcon('user') ?><div><h3>Gu của riêng bạn</h3><p>Đặt ngân sách và khẩu vị mặc định.</p></div><?= uiIcon('arrow') ?></a>
 </section>
-<script src="assets/search.js?v=20261119" defer></script>
+<script src="assets/search.js?v=20261121" defer></script>
 <?php renderPageFooter('index.php'); ?>

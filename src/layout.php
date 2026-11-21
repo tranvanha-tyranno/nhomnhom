@@ -16,7 +16,7 @@ function renderDocumentStart(string $title, string $bodyClass = ''): void
     echo '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>';
     echo '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap">';
     echo '<script>(function(){try{var t=localStorage.getItem("nhomnhom-theme");if(!t&&window.matchMedia("(prefers-color-scheme:dark)").matches)t="dark";if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}})();</script>';
-    echo '<link rel="stylesheet" href="assets/app.css?v=20261119"><link rel="stylesheet" href="assets/redesign.css?v=20261119"><link rel="stylesheet" href="assets/upgrade.css?v=20261119">';
+    echo '<link rel="stylesheet" href="assets/app.css?v=20261119"><link rel="stylesheet" href="assets/redesign.css?v=20261119"><link rel="stylesheet" href="assets/upgrade.css?v=20261121">';
     echo '<script src="assets/client.js?v=20261119" defer></script><script src="assets/ui.js?v=20261119" defer></script></head><body class="' . $bodyClass . '">';
     echo '<a class="skipLink" href="#main-content">Đến nội dung chính</a>';
 }
